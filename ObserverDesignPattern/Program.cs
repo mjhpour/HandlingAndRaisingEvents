@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+﻿// Author: mjavadhpour@gmail.com
+// License: MIT
 
 namespace ObserverDesignPattern
 {
@@ -14,12 +7,21 @@ namespace ObserverDesignPattern
     {
         public static void Main(string[] args)
         {       
-            BuildWebHost(args).Run();
-        }
+            BaggageHandler provider = new BaggageHandler();
+            ArrivalsMonitor observer1 = new ArrivalsMonitor("BaggageClaimMonitor1");
+            ArrivalsMonitor observer2 = new ArrivalsMonitor("SecurityExit");
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
+            provider.BaggageStatus(712, "Detroit", 3);
+            observer1.Subscribe(provider);
+            provider.BaggageStatus(712, "Kalamazoo", 3);
+            provider.BaggageStatus(400, "New York-Kennedy", 1);
+            provider.BaggageStatus(712, "Detroit", 3);
+            observer2.Subscribe(provider);
+            provider.BaggageStatus(511, "San Francisco", 2);
+            provider.BaggageStatus(712);
+            observer2.Unsubscribe();
+            provider.BaggageStatus(400);
+            provider.LastBaggageClaimed();
+        }
     }
 }
